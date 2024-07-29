@@ -4,7 +4,7 @@
 *.so
 
 # Ignorer l'exécutable principal
-philo
+philo/philo
 
 # Ignorer les fichiers log
 *.log
