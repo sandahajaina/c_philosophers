@@ -1,0 +1,28 @@
+# Ignorer les fichiers objets et binaires
+*.o
+*.a
+*.so
+
+# Ignorer l'exécutable principal
+philo
+
+# Ignorer les fichiers log
+*.log
+
+# Ignorer les dossiers de compilation
+/bin
+/obj
+/build
+/minilibx-linux
+/mlx_linux
+
+# Ignorer les fichiers temporaires et de sauvegarde
+*~
+*.swp
+
+# Ignorer les dossiers spécifiques aux IDEs
+.vscode/
+.idea/
+
+# Ignorer les fichiers spécifiques à macOS
+.DS_Store
