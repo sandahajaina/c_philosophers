@@ -1,5 +1,5 @@
 NAME = philo
-SRCS = philosophers.c
+SRCS = main.c
 OBJS = $(SRCS:.c=.o)
 CFLAGS = -Wall -Wextra -Werror
 
@@ -9,10 +9,10 @@ $(NAME) : $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 %.o : %.c
-	$(CC) $(CFLAGS) -g -c $< -o $@
+	$(CC) $(CFLAGS) -pthread -g -c $< -o $@
 
 leak : $(NAME)
-	valgrind --leak-check=full ./$(NAME)
+	valgrind --leak-check=full --track-origins=yes --tool=helgrind ./$(NAME)
 
 clean :
 	rm -f $(OBJS)
