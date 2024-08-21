@@ -1,5 +1,5 @@
 NAME = philo
-SRCS = main.c
+SRCS = main.c init.c utils.c
 OBJS = $(SRCS:.c=.o)
 CFLAGS = -Wall -Wextra -Werror
 
