@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 14:57:01 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/21 15:03:56 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/08/22 15:52:11 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ int main(int argc, char *argv[])
     {
         t_table table;
         init_table(&table, argc, argv);
-
-        
 
         //printf("philos: %d\ntime_to_die: %d\ntime_to_eat: %d\ntime_to_sleep: %d\n", 
         //table.number_philo, table.time_to_die, table.time_to_eat, table.time_to_sleep);

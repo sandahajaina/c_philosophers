@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/21 15:09:47 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/08/22 15:49:45 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ struct  s_table
 void    init_table(t_table *table, int argc, char **argv);
 int     ph_atoi(const char *nptr);
 long    current_timestamp(void);
+void    cleanup_table(t_table *table);
 
 #endif
 
