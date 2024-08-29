@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/22 15:49:45 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/08/29 16:46:00 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ typedef struct s_philosopher {
     int             state;
     long            last_meal_time;
     int             meals_eaten;
+    t_table         *table;
 } t_philosopher;
 
 struct  s_table
@@ -46,9 +47,11 @@ struct  s_table
 };
 
 void    init_table(t_table *table, int argc, char **argv);
+void    create_philosopher_threads(t_table *table);
 int     ph_atoi(const char *nptr);
 long    current_timestamp(void);
 void    cleanup_table(t_table *table);
+int     has_died(t_philosopher *philosopher);
 
 #endif
 

@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 14:57:01 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/22 15:52:11 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/08/29 16:43:50 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,23 +21,13 @@ void *hello_world(void *arg) {
 
 int main(int argc, char *argv[])
 {
-    // (void) argv;
-    // (void) argc;
-    // pthread_t   thread1, thread2;
-
-    // pthread_create(&thread1, NULL, hello_world, NULL);
-    // pthread_create(&thread2, NULL, hello_world, NULL);
-
-    // pthread_join(thread1, NULL);
-    //pthread_join(thread2, NULL);
-
     if (argc == 5 || argc == 6)
     {
         t_table table;
         init_table(&table, argc, argv);
 
-        //printf("philos: %d\ntime_to_die: %d\ntime_to_eat: %d\ntime_to_sleep: %d\n", 
-        //table.number_philo, table.time_to_die, table.time_to_eat, table.time_to_sleep);
+        create_philosopher_threads(&table);
+
         return (0);
     }
     return (1);
