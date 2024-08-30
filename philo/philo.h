@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/29 16:46:00 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/08/30 12:08:25 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ int     ph_atoi(const char *nptr);
 long    current_timestamp(void);
 void    cleanup_table(t_table *table);
 int     has_died(t_philosopher *philosopher);
+void	take_forks(t_philosopher *philosopher);
 
 #endif
 

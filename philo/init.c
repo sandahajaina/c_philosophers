@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/29 16:26:05 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/08/30 16:54:22 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	*philosopher_routine(void *arg)
 	philosopher = (t_philosopher *)arg;
 	while (1)
 	{
+		take_forks(philosopher);
 		if (has_died(philosopher))
 		{
 			pthread_mutex_lock(&philosopher->table->print_mutex);
@@ -90,4 +91,16 @@ void	cleanup_table(t_table *table)
 	pthread_mutex_destroy(&table->print_mutex);
 	free(table->forks);
 	free(table->philosophers);
+}
+
+void	take_forks(t_philosopher *philosopher)
+{
+	pthread_mutex_lock(philosopher->left_fork);
+	pthread_mutex_lock(&philosopher->table->print_mutex);
+	printf("%ld %d has taken a fork\n", current_timestamp(), philosopher->id);
+	pthread_mutex_unlock(&philosopher->table->print_mutex);
+	pthread_mutex_lock(philosopher->right_fork);
+	pthread_mutex_lock(&philosopher->table->print_mutex);
+	printf("%ld %d has taken a fork\n", current_timestamp(), philosopher->id);
+	pthread_mutex_unlock(&philosopher->table->print_mutex);
 }
