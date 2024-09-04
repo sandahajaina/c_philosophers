@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/30 16:54:22 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/04 16:47:05 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	init_table(t_table *table, int argc, char **argv)
 	i = -1;
 	while (++i < table->number_philo)
 	{
+		table->philosophers[i].table = table;
 		table->philosophers[i].id = i + 1;
 		table->philosophers[i].left_fork = &table->forks[i];
 		table->philosophers[i].right_fork = &table->forks[(i + 1)
@@ -38,7 +39,6 @@ void	init_table(t_table *table, int argc, char **argv)
 		pthread_mutex_init(&table->philosophers[i].state_mutex, NULL);
 		table->philosophers[i].state = 0;
 		table->philosophers[i].meals_eaten = 0;
-		table->philosophers[i].table = table;
 	}
 	pthread_mutex_init(&table->print_mutex, NULL);
 }
@@ -50,14 +50,16 @@ void	*philosopher_routine(void *arg)
 	philosopher = (t_philosopher *)arg;
 	while (1)
 	{
-		take_forks(philosopher);
+		eat(philosopher);
 		if (has_died(philosopher))
 		{
-			pthread_mutex_lock(&philosopher->table->print_mutex);
-			printf("%ld %d died\n", current_timestamp(), philosopher->id);
+			pthread_mutex_lock(&philosopher->state_mutex);
+			printf("%ld %d died\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
 			pthread_mutex_unlock(&philosopher->table->print_mutex);
+			break ;
 		}
 	}
+	return (NULL);
 }
 
 int	has_died(t_philosopher *philosopher)
@@ -76,6 +78,7 @@ void	create_philosopher_threads(t_table *table)
 		pthread_create(&table->philosophers[i].thread, NULL,
 			philosopher_routine, &table->philosophers[i]);
 	}
+	table->start_time = current_timestamp();
 }
 
 void	cleanup_table(t_table *table)
@@ -93,14 +96,56 @@ void	cleanup_table(t_table *table)
 	free(table->philosophers);
 }
 
-void	take_forks(t_philosopher *philosopher)
+void take_left_fork(t_philosopher *philosopher)
 {
 	pthread_mutex_lock(philosopher->left_fork);
 	pthread_mutex_lock(&philosopher->table->print_mutex);
-	printf("%ld %d has taken a fork\n", current_timestamp(), philosopher->id);
+	printf("%ld %d has taken a fork\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
 	pthread_mutex_unlock(&philosopher->table->print_mutex);
+}
+
+void take_right_fork(t_philosopher *philosopher)
+{
 	pthread_mutex_lock(philosopher->right_fork);
 	pthread_mutex_lock(&philosopher->table->print_mutex);
-	printf("%ld %d has taken a fork\n", current_timestamp(), philosopher->id);
+	printf("%ld %d has taken a fork\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
 	pthread_mutex_unlock(&philosopher->table->print_mutex);
+}
+
+void	take_forks(t_philosopher *philosopher)
+{
+	if (philosopher->left_fork < philosopher->right_fork)
+	{
+		take_left_fork(philosopher);
+		take_right_fork(philosopher);
+	} 
+	else
+	{
+		take_right_fork(philosopher);
+		take_left_fork(philosopher);
+	}
+}
+
+void	think(t_philosopher *philosopher)
+{
+	pthread_mutex_lock(&philosopher->table->print_mutex);
+	printf("%ld %d is thinking\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
+	pthread_mutex_unlock(&philosopher->table->print_mutex);
+}
+
+void	put_down_forks(t_philosopher *philosopher)
+{
+    pthread_mutex_unlock(philosopher->right_fork);
+    pthread_mutex_unlock(philosopher->left_fork);
+}
+
+void	eat(t_philosopher *philosopher)
+{
+	take_forks(philosopher);
+	pthread_mutex_lock(&philosopher->table->print_mutex);
+	printf("%ld %d is eating\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
+	pthread_mutex_unlock(&philosopher->table->print_mutex);
+	usleep(philosopher->table->time_to_eat * 1000);
+	//philosopher->last_meal_time = current_timestamp();
+	put_down_forks(philosopher);
 }

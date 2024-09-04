@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 14:57:01 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/30 12:24:42 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/04 13:27:35 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void *hello_world(void *arg) {
     return NULL;
 }
 
-void    join_philosophers(t_table *table)
+void    start_simulation(t_table *table)
 {
     int i;
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
         create_philosopher_threads(&table);
 
-        join_philosophers(&table);
+        start_simulation(&table);
 
         return (0);
     }
