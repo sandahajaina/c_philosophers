@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/04 14:47:06 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/05 12:05:18 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	take_forks(t_philosopher *philosopher);
 void	think(t_philosopher *philosopher);
 void	put_down_forks(t_philosopher *philosopher);
 void	eat(t_philosopher *philosopher);
+void	ph_sleep(t_philosopher *philosopher);
 
 #endif
 

@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/04 16:47:05 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/05 12:38:05 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	*philosopher_routine(void *arg)
 	while (1)
 	{
 		eat(philosopher);
+		ph_sleep(philosopher);
 		if (has_died(philosopher))
 		{
 			pthread_mutex_lock(&philosopher->state_mutex);
@@ -145,7 +146,18 @@ void	eat(t_philosopher *philosopher)
 	pthread_mutex_lock(&philosopher->table->print_mutex);
 	printf("%ld %d is eating\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
 	pthread_mutex_unlock(&philosopher->table->print_mutex);
+	philosopher->last_meal_time = current_timestamp();
 	usleep(philosopher->table->time_to_eat * 1000);
-	//philosopher->last_meal_time = current_timestamp();
 	put_down_forks(philosopher);
+}
+
+void	ph_sleep(t_philosopher *philosopher)
+{
+	pthread_mutex_lock(&philosopher->state_mutex);
+	philosopher->state = 2;
+	pthread_mutex_unlock(&philosopher->state_mutex);
+	pthread_mutex_lock(&philosopher->table->print_mutex);
+	printf("%ld %d is sleeping\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
+	pthread_mutex_unlock(&philosopher->table->print_mutex);
+	usleep(philosopher->table->time_to_sleep * 1000);
 }
