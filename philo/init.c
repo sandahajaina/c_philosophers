@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/05 12:38:05 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/06 12:33:39 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ void	*philosopher_routine(void *arg)
 	{
 		eat(philosopher);
 		ph_sleep(philosopher);
+		think(philosopher);
 		if (has_died(philosopher))
 		{
 			pthread_mutex_lock(&philosopher->state_mutex);
@@ -74,12 +75,12 @@ void	create_philosopher_threads(t_table *table)
 	int	i;
 
 	i = -1;
+	table->start_time = current_timestamp();
 	while (++i < table->number_philo)
 	{
 		pthread_create(&table->philosophers[i].thread, NULL,
 			philosopher_routine, &table->philosophers[i]);
 	}
-	table->start_time = current_timestamp();
 }
 
 void	cleanup_table(t_table *table)
@@ -147,6 +148,7 @@ void	eat(t_philosopher *philosopher)
 	printf("%ld %d is eating\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
 	pthread_mutex_unlock(&philosopher->table->print_mutex);
 	philosopher->last_meal_time = current_timestamp();
+	philosopher->meals_eaten++;
 	usleep(philosopher->table->time_to_eat * 1000);
 	put_down_forks(philosopher);
 }

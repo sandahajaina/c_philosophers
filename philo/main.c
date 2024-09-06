@@ -6,18 +6,12 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 14:57:01 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/05 10:55:15 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/06 15:30:04 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "philo.h"
-
-void *hello_world(void *arg) {
-    (void) arg;
-    printf("Hello from thread %ld!\n", pthread_self());
-    return NULL;
-}
 
 void    start_simulation(t_table *table)
 {
@@ -41,6 +35,8 @@ int main(int argc, char *argv[])
         create_philosopher_threads(&table);
 
         start_simulation(&table);
+
+        cleanup_table(&table);
 
         return (0);
     }

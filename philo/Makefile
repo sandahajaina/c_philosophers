@@ -12,7 +12,7 @@ $(NAME) : $(OBJS)
 	$(CC) $(CFLAGS) -pthread -g -c $< -o $@
 
 leak : $(NAME)
-	valgrind $(--leak-check=full --track-origins=yes --tool=helgrind) ./$(NAME) 5 800 200 200
+	valgrind $(--leak-check=full --track-origins=yes --tool=helgrind) ./$(NAME) 50 400 200 200
 
 clean :
 	rm -f $(OBJS)

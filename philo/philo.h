@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/05 12:05:18 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/06 12:31:22 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 
 typedef struct s_table t_table;
 typedef struct s_fork  t_fork;
+typedef enum e_state    t_state;
 
 typedef struct s_philosopher {
     int             id;
@@ -52,6 +53,14 @@ struct  s_fork
 {
     int             fork_id;
     pthread_mutex_t *fork;
+};
+
+enum    e_state
+{
+    SLEEPING,
+    EATING,
+    THINKING,
+    DEAD
 };
 
 void    init_table(t_table *table, int argc, char **argv);
