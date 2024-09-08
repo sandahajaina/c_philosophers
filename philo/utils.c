@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 14:04:51 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/08/29 13:12:57 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/08 21:50:10 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	ph_atoi(const char *nptr)
 	return (nb * sign);
 }
 
-long current_timestamp(void)
+long long current_timestamp(void)
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);

@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 14:57:01 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/06 15:30:04 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/08 22:43:09 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@ int main(int argc, char *argv[])
         init_table(&table, argc, argv);
 
         create_philosopher_threads(&table);
-
-        start_simulation(&table);
 
         cleanup_table(&table);
 

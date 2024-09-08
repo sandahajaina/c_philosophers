@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/06 12:31:22 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/08 22:39:52 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ typedef struct s_philosopher {
     pthread_mutex_t *right_fork;
     pthread_mutex_t state_mutex;
     int             state;
-    long            last_meal_time;
+    long long       last_meal_time;
     int             meals_eaten;
     t_table         *table;
 } t_philosopher;
@@ -43,10 +43,12 @@ struct  s_table
     int             time_to_eat;
     int             time_to_sleep;
     int             number_meals_required;
-    long            start_time;
+    long long            start_time;
     pthread_mutex_t print_mutex;
     pthread_mutex_t *forks;
     t_philosopher   *philosophers;
+    pthread_mutex_t simulation_mutex;
+    int             simulation_running;
 };
 
 struct  s_fork
@@ -66,7 +68,7 @@ enum    e_state
 void    init_table(t_table *table, int argc, char **argv);
 void    create_philosopher_threads(t_table *table);
 int     ph_atoi(const char *nptr);
-long    current_timestamp(void);
+long long   current_timestamp(void);
 void    cleanup_table(t_table *table);
 int     has_died(t_philosopher *philosopher);
 void	take_forks(t_philosopher *philosopher);
@@ -74,6 +76,7 @@ void	think(t_philosopher *philosopher);
 void	put_down_forks(t_philosopher *philosopher);
 void	eat(t_philosopher *philosopher);
 void	ph_sleep(t_philosopher *philosopher);
+void    *monitoring_routine(void *arg);
 
 #endif
 
