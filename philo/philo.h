@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/08 22:39:52 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/09 16:31:20 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ typedef struct s_philosopher {
     pthread_mutex_t *right_fork;
     pthread_mutex_t state_mutex;
     int             state;
+    pthread_mutex_t meal_mutex;
     long long       last_meal_time;
     int             meals_eaten;
     t_table         *table;

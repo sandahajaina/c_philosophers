@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/08 23:06:13 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/09 17:02:42 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	init_table(t_table *table, int argc, char **argv)
 		table->philosophers[i].right_fork = &table->forks[(i + 1)
 			% table->number_philo];
 		pthread_mutex_init(&table->philosophers[i].state_mutex, NULL);
+		pthread_mutex_init(&table->philosophers[i].meal_mutex, NULL);
 		table->philosophers[i].state = 0;
 		table->philosophers[i].meals_eaten = 0;
 	}
@@ -102,12 +103,15 @@ void *monitoring_routine(void *arg) {
         i = 0;
         while (i < table->number_philo) {
             pthread_mutex_lock(&table->simulation_mutex);
+			pthread_mutex_lock(&table->philosophers[i].meal_mutex);
             if (current_timestamp() - table->philosophers[i].last_meal_time > table->time_to_die) {
+				pthread_mutex_unlock(&table->philosophers[i].meal_mutex);
 				table->simulation_running = 0;
 				printf("%lld %d died\n", (current_timestamp() - table->start_time), table->philosophers[i].id);
                 pthread_mutex_unlock(&table->simulation_mutex);
                 return NULL;
             }
+			pthread_mutex_unlock(&table->philosophers[i].meal_mutex);
             pthread_mutex_unlock(&table->simulation_mutex);
             i++;
         }
@@ -181,7 +185,9 @@ void	eat(t_philosopher *philosopher)
 	pthread_mutex_lock(&philosopher->table->print_mutex);
 	printf("%lld %d is eating\n", (current_timestamp() - philosopher->table->start_time), philosopher->id);
 	pthread_mutex_unlock(&philosopher->table->print_mutex);
+	pthread_mutex_lock(&philosopher->meal_mutex);
 	philosopher->last_meal_time = current_timestamp();
+	pthread_mutex_unlock(&philosopher->meal_mutex);
 	philosopher->meals_eaten++;
 	usleep(philosopher->table->time_to_eat * 1000);
 	put_down_forks(philosopher);
