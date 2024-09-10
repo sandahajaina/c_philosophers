@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/09 16:31:20 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/10 16:49:36 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include <sys/time.h>
 
 typedef struct s_table t_table;
-typedef struct s_fork  t_fork;
 typedef enum e_state    t_state;
 
 typedef struct s_philosopher {
@@ -52,12 +51,6 @@ struct  s_table
     int             simulation_running;
 };
 
-struct  s_fork
-{
-    int             fork_id;
-    pthread_mutex_t *fork;
-};
-
 enum    e_state
 {
     SLEEPING,
@@ -78,6 +71,8 @@ void	put_down_forks(t_philosopher *philosopher);
 void	eat(t_philosopher *philosopher);
 void	ph_sleep(t_philosopher *philosopher);
 void    *monitoring_routine(void *arg);
+void    print_status(t_philosopher *philosopher, char *message);
+void	ph_usleep(t_philosopher *philosopher ,int sleep_time);
 
 #endif
 
