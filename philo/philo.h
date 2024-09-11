@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/10 16:49:36 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/11 16:16:57 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,23 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+typedef struct s_fork t_fork;
 typedef struct s_table t_table;
 typedef enum e_state    t_state;
+
+struct s_fork
+{
+    int             id;
+    pthread_mutex_t mutex;
+};
 
 typedef struct s_philosopher {
     int             id;
     pthread_t       thread;
-    pthread_mutex_t *left_fork;
-    pthread_mutex_t *right_fork;
+    int             left_fork;
+    int             right_fork;
     pthread_mutex_t state_mutex;
-    int             state;
+    t_state         state;
     pthread_mutex_t meal_mutex;
     long long       last_meal_time;
     int             meals_eaten;
@@ -43,10 +50,10 @@ struct  s_table
     int             time_to_eat;
     int             time_to_sleep;
     int             number_meals_required;
-    long long            start_time;
+    long long       start_time;
     pthread_mutex_t print_mutex;
-    pthread_mutex_t *forks;
-    t_philosopher   *philosophers;
+    t_fork          forks[200];
+    t_philosopher   philosophers[200];
     pthread_mutex_t simulation_mutex;
     int             simulation_running;
 };
@@ -73,6 +80,7 @@ void	ph_sleep(t_philosopher *philosopher);
 void    *monitoring_routine(void *arg);
 void    print_status(t_philosopher *philosopher, char *message);
 void	ph_usleep(t_philosopher *philosopher ,int sleep_time);
+void	init_fork(t_table *table);
 
 #endif
 
