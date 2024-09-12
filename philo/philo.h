@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/11 16:16:57 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/12 16:32:44 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,26 @@ struct s_fork
     pthread_mutex_t mutex;
 };
 
+enum    e_state
+{
+    SLEEPING,
+    EATING,
+    THINKING,
+    DEAD
+};
+
 typedef struct s_philosopher {
     int             id;
     pthread_t       thread;
     int             left_fork;
     int             right_fork;
-    pthread_mutex_t state_mutex;
+    pthread_mutex_t m_state;
     t_state         state;
-    pthread_mutex_t meal_mutex;
+    pthread_mutex_t m_last_meal_time;
     long long       last_meal_time;
+    long long       start_time;
+    pthread_mutex_t m_start_time;
+    pthread_mutex_t m_meals_eaten;
     int             meals_eaten;
     t_table         *table;
 } t_philosopher;
@@ -58,20 +69,11 @@ struct  s_table
     int             simulation_running;
 };
 
-enum    e_state
-{
-    SLEEPING,
-    EATING,
-    THINKING,
-    DEAD
-};
-
 void    init_table(t_table *table, int argc, char **argv);
 void    create_philosopher_threads(t_table *table);
 int     ph_atoi(const char *nptr);
 long long   current_timestamp(void);
 void    cleanup_table(t_table *table);
-int     has_died(t_philosopher *philosopher);
 void	take_forks(t_philosopher *philosopher);
 void	think(t_philosopher *philosopher);
 void	put_down_forks(t_philosopher *philosopher);
@@ -81,6 +83,8 @@ void    *monitoring_routine(void *arg);
 void    print_status(t_philosopher *philosopher, char *message);
 void	ph_usleep(t_philosopher *philosopher ,int sleep_time);
 void	init_fork(t_table *table);
+void	set_philo_state(t_philosopher *philosopher, t_state state);
+int	    check_philo_death(t_philosopher *philosopher);
 
 #endif
 

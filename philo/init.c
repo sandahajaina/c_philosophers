@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/11 16:25:12 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/12 16:34:10 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,13 @@ void	init_table(t_table *table, int argc, char **argv)
 		table->philosophers[i].id = i + 1;
 		table->philosophers[i].left_fork = i;
 		table->philosophers[i].right_fork = (i + 1) % table->number_philo;
-		pthread_mutex_init(&table->philosophers[i].state_mutex, NULL);
-		pthread_mutex_init(&table->philosophers[i].meal_mutex, NULL);
+		pthread_mutex_init(&table->philosophers[i].m_state, NULL);
+		pthread_mutex_init(&table->philosophers[i].m_last_meal_time, NULL);
+		pthread_mutex_init(&table->philosophers[i].m_meals_eaten, NULL);
+		pthread_mutex_init(&table->philosophers[i].m_start_time, NULL);
 		table->philosophers[i].state = 0;
 		table->philosophers[i].meals_eaten = 0;
+		table->philosophers[i].start_time = current_timestamp();
 	}
 	pthread_mutex_init(&table->print_mutex, NULL);
 }
@@ -58,29 +61,32 @@ void	init_fork(t_table *table)
 void	*philosopher_routine(void *arg)
 {
 	t_philosopher	*philosopher;
-	int	i;
 
 	philosopher = (t_philosopher *)arg;
-	/*
-	while(current_timestamp() < start_time)
-		usleep(10);
-	*/
-	i = 0;
-	if ((i++ != 1) && philosopher->id % 2 != 0)
+
+	if (philosopher->id % 2 != 0)
 		usleep(20);
 	while (1)
 	{
-		pthread_mutex_lock(&philosopher->table->simulation_mutex);
-        if (!(philosopher->table->simulation_running)) {
-            pthread_mutex_unlock(&philosopher->table->simulation_mutex);
-            break;
-        }
-        pthread_mutex_unlock(&philosopher->table->simulation_mutex);
+		if (check_philo_death(philosopher))
+			break ;
 		eat(philosopher);
 		ph_sleep(philosopher);
 		think(philosopher);
 	}
 	return (NULL);
+}
+
+int	check_philo_death(t_philosopher *philosopher)
+{
+	pthread_mutex_lock(&philosopher->table->simulation_mutex);
+	if (!(philosopher->table->simulation_running))
+	{
+		pthread_mutex_unlock(&philosopher->table->simulation_mutex);
+		return (1);
+	}
+	pthread_mutex_unlock(&philosopher->table->simulation_mutex);
+	return (0);
 }
 
 void	create_philosopher_threads(t_table *table)
@@ -113,20 +119,19 @@ void *monitoring_routine(void *arg) {
     while (1) {
         i = 0;
         while (i < table->number_philo) {
-            pthread_mutex_lock(&table->simulation_mutex);
-			pthread_mutex_lock(&table->philosophers[i].meal_mutex);
+			pthread_mutex_lock(&table->philosophers[i].m_last_meal_time);
             if (current_timestamp() - table->philosophers[i].last_meal_time > table->time_to_die) {
-				pthread_mutex_unlock(&table->philosophers[i].meal_mutex);
+				pthread_mutex_lock(&table->simulation_mutex);
 				table->simulation_running = 0;
 				printf("%lld %d died\n", (current_timestamp() - table->start_time), table->philosophers[i].id);
                 pthread_mutex_unlock(&table->simulation_mutex);
+				pthread_mutex_unlock(&table->philosophers[i].m_last_meal_time);
                 return NULL;
             }
-			pthread_mutex_unlock(&table->philosophers[i].meal_mutex);
-            pthread_mutex_unlock(&table->simulation_mutex);
+			pthread_mutex_unlock(&table->philosophers[i].m_last_meal_time);
             i++;
         }
-        usleep(500);
+        usleep(1000);
     }
 }
 
@@ -143,7 +148,7 @@ void	cleanup_table(t_table *table)
 	while (++i < table->number_philo)
 	{
 		pthread_mutex_destroy(&table->forks[i].mutex);
-		pthread_mutex_destroy(&table->philosophers[i].state_mutex);
+		pthread_mutex_destroy(&table->philosophers[i].m_state);
 	}
 	pthread_mutex_destroy(&table->print_mutex);
 	pthread_mutex_destroy(&table->simulation_mutex);
@@ -190,7 +195,9 @@ void	take_forks(t_philosopher *philosopher)
 
 void	think(t_philosopher *philosopher)
 {
+	set_philo_state(philosopher, THINKING);
 	print_status(philosopher, "is thinking");
+	usleep(1);
 }
 
 void	put_down_forks(t_philosopher *philosopher)
@@ -199,23 +206,31 @@ void	put_down_forks(t_philosopher *philosopher)
     pthread_mutex_unlock(&philosopher->table->forks[philosopher->left_fork].mutex);
 }
 
-void	eat(t_philosopher *philosopher)
+void eat(t_philosopher *philosopher)
 {
 	take_forks(philosopher);
-	pthread_mutex_lock(&philosopher->meal_mutex);
+	set_philo_state(philosopher, EATING);
+	pthread_mutex_lock(&philosopher->m_last_meal_time);
 	philosopher->last_meal_time = current_timestamp();
-	pthread_mutex_unlock(&philosopher->meal_mutex);
+	pthread_mutex_unlock(&philosopher->m_last_meal_time);
 	print_status(philosopher, "is eating");
+	pthread_mutex_lock(&philosopher->m_meals_eaten);
 	philosopher->meals_eaten++;
+	pthread_mutex_unlock(&philosopher->m_meals_eaten);
 	ph_usleep(philosopher, philosopher->table->time_to_eat);
 	put_down_forks(philosopher);
 }
 
+void set_philo_state(t_philosopher *philosopher, t_state state)
+{
+	pthread_mutex_lock(&philosopher->m_state);
+	philosopher->state = state;
+	pthread_mutex_unlock(&philosopher->m_state);
+}
+
 void	ph_sleep(t_philosopher *philosopher)
 {
-	pthread_mutex_lock(&philosopher->state_mutex);
-	philosopher->state = SLEEPING;
-	pthread_mutex_unlock(&philosopher->state_mutex);
+	set_philo_state(philosopher, SLEEPING);
 	print_status(philosopher, "is sleeping");
 	ph_usleep(philosopher, philosopher->table->time_to_sleep);
 }
@@ -225,10 +240,10 @@ void	ph_usleep(t_philosopher *philosopher ,int sleep_time)
 	long long	start;
 
 	start = current_timestamp();
-	pthread_mutex_lock(&philosopher->table->simulation_mutex);
-	if (philosopher->table->simulation_running == 0)
+	if (check_philo_death(philosopher))
 		return ;
-	pthread_mutex_unlock(&philosopher->table->simulation_mutex);
 	while ((current_timestamp() - start) < (long long) sleep_time)
-		usleep(1);
+	{
+		usleep(50);
+	}
 }
