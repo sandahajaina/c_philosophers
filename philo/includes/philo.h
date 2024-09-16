@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/16 12:40:45 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/16 17:10:13 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ struct  s_table
 };
 
 void    init_table(t_table *table, int argc, char **argv);
+void	*philosopher_routine(void *arg);
+void	init_philosophers(t_table *table);
 void    create_philosopher_threads(t_table *table);
 int     ph_atoi(const char *nptr);
 long long   current_timestamp(void);
@@ -72,7 +74,10 @@ void    *monitoring_routine(void *arg);
 void    print_status(t_philosopher *philosopher, char *message);
 void	ph_usleep(t_philosopher *philosopher ,int sleep_time);
 void	init_fork(t_table *table);
-int	    check_philo_death(t_philosopher *philosopher);
+int	    check_simulation_running(t_philosopher *philosopher);
+int     check_input(int argc, char **argv);
+void	take_right_fork(t_philosopher *philosopher);
+void	take_left_fork(t_philosopher *philosopher);
 
 #endif
 

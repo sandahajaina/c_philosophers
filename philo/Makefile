@@ -1,5 +1,5 @@
 NAME = philo
-SRCS = main.c init.c utils.c
+SRCS = srcs/main.c srcs/init.c srcs/utils.c srcs/monitoring.c srcs/philosopher.c srcs/actions.c
 OBJS = $(SRCS:.c=.o)
 CFLAGS = -Wall -Wextra -Werror
 
