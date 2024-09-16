@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/16 15:04:05 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/12 16:32:44 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/16 12:40:45 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 
 typedef struct s_fork t_fork;
 typedef struct s_table t_table;
-typedef enum e_state    t_state;
 
 struct s_fork
 {
@@ -30,21 +29,11 @@ struct s_fork
     pthread_mutex_t mutex;
 };
 
-enum    e_state
-{
-    SLEEPING,
-    EATING,
-    THINKING,
-    DEAD
-};
-
 typedef struct s_philosopher {
     int             id;
     pthread_t       thread;
     int             left_fork;
     int             right_fork;
-    pthread_mutex_t m_state;
-    t_state         state;
     pthread_mutex_t m_last_meal_time;
     long long       last_meal_time;
     long long       start_time;
@@ -74,7 +63,7 @@ void    create_philosopher_threads(t_table *table);
 int     ph_atoi(const char *nptr);
 long long   current_timestamp(void);
 void    cleanup_table(t_table *table);
-void	take_forks(t_philosopher *philosopher);
+int	    take_forks(t_philosopher *philosopher);
 void	think(t_philosopher *philosopher);
 void	put_down_forks(t_philosopher *philosopher);
 void	eat(t_philosopher *philosopher);
@@ -83,7 +72,6 @@ void    *monitoring_routine(void *arg);
 void    print_status(t_philosopher *philosopher, char *message);
 void	ph_usleep(t_philosopher *philosopher ,int sleep_time);
 void	init_fork(t_table *table);
-void	set_philo_state(t_philosopher *philosopher, t_state state);
 int	    check_philo_death(t_philosopher *philosopher);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: sranaivo <sranaivo@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/21 13:55:34 by sranaivo          #+#    #+#             */
-/*   Updated: 2024/09/13 17:04:35 by sranaivo         ###   ########.fr       */
+/*   Updated: 2024/09/16 12:45:44 by sranaivo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,9 @@ void	init_table(t_table *table, int argc, char **argv)
 		table->philosophers[i].id = i + 1;
 		table->philosophers[i].left_fork = i;
 		table->philosophers[i].right_fork = (i + 1) % table->number_philo;
-		pthread_mutex_init(&table->philosophers[i].m_state, NULL);
 		pthread_mutex_init(&table->philosophers[i].m_last_meal_time, NULL);
 		pthread_mutex_init(&table->philosophers[i].m_meals_eaten, NULL);
 		pthread_mutex_init(&table->philosophers[i].m_start_time, NULL);
-		table->philosophers[i].state = 0;
 		table->philosophers[i].meals_eaten = 0;
 		table->philosophers[i].start_time = current_timestamp();
 	}
@@ -167,7 +165,6 @@ void	cleanup_table(t_table *table)
 	while (++i < table->number_philo)
 	{
 		pthread_mutex_destroy(&table->forks[i].mutex);
-		pthread_mutex_destroy(&table->philosophers[i].m_state);
 	}
 	pthread_mutex_destroy(&table->print_mutex);
 	pthread_mutex_destroy(&table->simulation_mutex);
@@ -202,10 +199,19 @@ void	take_right_fork(t_philosopher *philosopher)
 	print_status(philosopher, "has taken a fork");
 }
 
-void	take_forks(t_philosopher *philosopher)
+int	take_forks(t_philosopher *philosopher)
 {
 	if (check_philo_death(philosopher))
-		return ;
+		return (0);
+	if (philosopher->table->number_philo == 1)
+	{
+		take_left_fork(philosopher);
+		pthread_mutex_lock(&philosopher->table->simulation_mutex);
+		philosopher->table->simulation_running = 0;
+		pthread_mutex_unlock(&philosopher->table->simulation_mutex);
+		pthread_mutex_unlock(&philosopher->table->forks[0].mutex);
+		return (0);
+	}
 	if (philosopher->left_fork < philosopher->right_fork)
 	{
 		take_left_fork(philosopher);
@@ -216,11 +222,11 @@ void	take_forks(t_philosopher *philosopher)
 		take_right_fork(philosopher);
 		take_left_fork(philosopher);
 	}
+	return (1);
 }
 
 void	think(t_philosopher *philosopher)
 {
-	set_philo_state(philosopher, THINKING);
 	print_status(philosopher, "is thinking");
 	usleep(1);
 }
@@ -233,8 +239,8 @@ void	put_down_forks(t_philosopher *philosopher)
 
 void	eat(t_philosopher *philosopher)
 {
-	take_forks(philosopher);
-	set_philo_state(philosopher, EATING);
+	if (!(take_forks(philosopher)))
+		return ;
 	pthread_mutex_lock(&philosopher->m_last_meal_time);
 	philosopher->last_meal_time = current_timestamp();
 	pthread_mutex_unlock(&philosopher->m_last_meal_time);
@@ -246,16 +252,8 @@ void	eat(t_philosopher *philosopher)
 	put_down_forks(philosopher);
 }
 
-void	set_philo_state(t_philosopher *philosopher, t_state state)
-{
-	pthread_mutex_lock(&philosopher->m_state);
-	philosopher->state = state;
-	pthread_mutex_unlock(&philosopher->m_state);
-}
-
 void	ph_sleep(t_philosopher *philosopher)
 {
-	set_philo_state(philosopher, SLEEPING);
 	print_status(philosopher, "is sleeping");
 	ph_usleep(philosopher, philosopher->table->time_to_sleep);
 }
